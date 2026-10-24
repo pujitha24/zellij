@@ -476,7 +476,13 @@ pub fn delete_session(name: &str, force: bool) {
 }
 
 pub fn list_sessions(no_formatting: bool, short: bool, reverse: bool) {
-    let exit_code = match get_sessions() {
+    process::exit(print_session_list(no_formatting, short, reverse));
+}
+
+/// Prints the session list and returns the exit code `list_sessions` would use, leaving
+/// the choice of whether (and with what code) to exit to the caller.
+pub fn print_session_list(no_formatting: bool, short: bool, reverse: bool) -> i32 {
+    match get_sessions() {
         Ok(running_sessions) => {
             let resurrectable_sessions = get_resurrectable_sessions();
             let mut all_sessions: HashMap<String, (Duration, bool)> = resurrectable_sessions
@@ -508,8 +514,7 @@ pub fn list_sessions(no_formatting: bool, short: bool, reverse: bool) {
             eprintln!("Error occurred: {:?}", e);
             1
         },
-    };
-    process::exit(exit_code);
+    }
 }
 
 #[derive(Debug, Clone)]
